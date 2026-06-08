@@ -4,6 +4,7 @@ import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Shapes
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
@@ -14,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 
 /**
@@ -108,6 +110,23 @@ private val ExpressiveDarkColorScheme = darkColorScheme(
     inversePrimary = Color(0xFF6750A4)
 )
 
+/**
+ * Material3 Expressive 风格的 Shape 方案。
+ * Expressive 风格：比默认更圆润，卡片/按钮使用大圆角。
+ *  - extraSmall: 6dp  (默认 4dp)
+ *  - small:      12dp (默认 8dp)
+ *  - medium:     16dp (默认 12dp)
+ *  - large:      28dp (默认 16dp) — 用于卡片、对话框容器
+ *  - extraLarge: 40dp (默认 28dp)
+ */
+private val ExpressiveShapes = Shapes(
+    extraSmall = androidx.compose.foundation.shape.RoundedCornerShape(6.dp),
+    small = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
+    medium = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
+    large = androidx.compose.foundation.shape.RoundedCornerShape(28.dp),
+    extraLarge = androidx.compose.foundation.shape.RoundedCornerShape(40.dp)
+)
+
 @Composable
 fun AccountsTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -132,7 +151,6 @@ fun AccountsTheme(
             val window = (view.context as Activity).window
 
             // 边缘到边缘 (Edge-to-Edge)：让内容延伸到状态栏与导航栏之下
-            // 在 API 30+ 使用系统 inset 控制器；老版本回退到 WindowCompat 实现。
             WindowCompat.setDecorFitsSystemWindows(window, false)
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -162,6 +180,7 @@ fun AccountsTheme(
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
+        shapes = ExpressiveShapes,
         content = content
     )
 }

@@ -18,16 +18,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.twotone.Delete
+import androidx.compose.material.icons.twotone.DeleteOutline
 import androidx.compose.material.icons.twotone.Person
-import androidx.compose.material.icons.twotone.Warning
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,6 +35,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.SuggestionChipDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -50,6 +50,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
@@ -75,7 +76,7 @@ fun UserManagerPage(
         viewModel.dispatch(UserManagerViewAction.Load)
     }
 
-    // LargeTopAppBar 的滚动行为（Expressive 风格：折叠大标题 → 小标题）
+    // M3 Expressive: 可折叠的 LargeTopAppBar，滚动时标题会缩小
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
         rememberTopAppBarState()
     )
@@ -87,23 +88,22 @@ fun UserManagerPage(
         topBar = {
             LargeTopAppBar(
                 title = {
-                    Column {
-                        Text(
-                            text = stringResource(R.string.user_manager),
-                            style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
+                    Text(
+                        text = stringResource(R.string.user_manager),
+                        fontWeight = FontWeight.Medium
+                    )
                 },
                 scrollBehavior = scrollBehavior,
                 colors = TopAppBarDefaults.largeTopAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                    scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+                    scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface
                 )
             )
         },
         containerColor = MaterialTheme.colorScheme.surfaceContainerLow
     ) { padding ->
+
         AnimatedVisibility(
             visible = viewModel.state.cause != null,
             enter = fadeIn(),
@@ -115,15 +115,35 @@ fun UserManagerPage(
                     .padding(padding),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = viewModel.state.cause
-                        ?.help()
-                        ?: viewModel.state.cause?.localizedMessage
-                        ?: viewModel.state.cause?.toString()
-                        ?: "",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier.padding(24.dp)
+                ) {
+                    Surface(
+                        modifier = Modifier.size(80.dp),
+                        shape = CircleShape,
+                        color = MaterialTheme.colorScheme.errorContainer
+                    ) {
+                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            Icon(
+                                imageVector = Icons.TwoTone.Person,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onErrorContainer,
+                                modifier = Modifier.size(40.dp)
+                            )
+                        }
+                    }
+                    Text(
+                        text = viewModel.state.cause
+                            ?.help()
+                            ?: viewModel.state.cause?.localizedMessage
+                            ?: viewModel.state.cause?.toString()
+                            ?: "",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
         }
 
@@ -133,15 +153,14 @@ fun UserManagerPage(
             exit = fadeOut()
         ) {
             LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize(),
+                modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(
-                    start = 16.dp,
-                    end = 16.dp,
-                    top = padding.calculateTopPadding() + 8.dp,
-                    bottom = padding.calculateBottomPadding() + 24.dp
+                    start = 24.dp,
+                    end = 24.dp,
+                    top = padding.calculateTopPadding() + 16.dp,
+                    bottom = padding.calculateBottomPadding() + 32.dp
                 ),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
                 items(viewModel.state.users, key = { it.id }) { user ->
                     var alpha by remember { mutableStateOf(0f) }
@@ -160,10 +179,11 @@ fun UserManagerPage(
                         user = user,
                         onOpenAccounts = {
                             navController.navigate(MainScreen.AccountManager.builder(user.id))
+                        },
+                        onRemove = {
+                            viewModel.dispatch(UserManagerViewAction.Remove(user))
                         }
-                    ) {
-                        viewModel.dispatch(UserManagerViewAction.Remove(user))
-                    }
+                    )
                 }
             }
         }
@@ -179,7 +199,6 @@ private fun UserItemCard(
     onRemove: () -> Unit
 ) {
     val canRemove = Process.myUserHandle().id != user.id
-
     var showConfirm by remember { mutableStateOf(false) }
 
     Card(
@@ -188,34 +207,33 @@ private fun UserItemCard(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 0.dp,
+            pressedElevation = 0.dp
+        )
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp)
+                .padding(24.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                horizontalArrangement = Arrangement.spacedBy(20.dp)
             ) {
-                // 圆形头像图标容器（Expressive 风格：高对比 primary container）
+                // M3 Expressive: 圆形 primaryContainer 图标容器
                 Surface(
-                    modifier = Modifier
-                        .width(56.dp)
-                        .height(56.dp),
+                    modifier = Modifier.size(72.dp),
                     shape = CircleShape,
                     color = MaterialTheme.colorScheme.primaryContainer
                 ) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Icon(
                             imageVector = Icons.TwoTone.Person,
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                            modifier = Modifier.size(36.dp)
                         )
                     }
                 }
@@ -223,12 +241,13 @@ private fun UserItemCard(
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = user.name ?: stringResource(R.string.user_name_default),
-                        style = MaterialTheme.typography.titleLarge,
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        text = "ID: ${user.id}",
+                        text = stringResource(R.string.user_id_format, user.id),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -237,31 +256,25 @@ private fun UserItemCard(
                 if (canRemove) {
                     IconButton(onClick = { showConfirm = true }) {
                         Icon(
-                            imageVector = Icons.TwoTone.Delete,
+                            imageVector = Icons.TwoTone.DeleteOutline,
                             contentDescription = stringResource(R.string.remove),
-                            tint = MaterialTheme.colorScheme.error
+                            tint = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.size(28.dp)
                         )
                     }
                 }
             }
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(20.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Expressive 风格 chip：表明"当前用户"状态（或仅装饰）
-                AssistChip(
+                // 状态 chip：表示用户类型
+                SuggestionChip(
                     onClick = { },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.TwoTone.Person,
-                            contentDescription = null,
-                            modifier = Modifier.height(AssistChipDefaults.IconSize)
-                        )
-                    },
                     label = {
                         Text(
                             text = if (Process.myUserHandle().id == user.id)
@@ -270,18 +283,38 @@ private fun UserItemCard(
                             style = MaterialTheme.typography.labelLarge
                         )
                     },
-                    colors = AssistChipDefaults.assistChipColors(
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.TwoTone.Person,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                            modifier = Modifier.size(SuggestionChipDefaults.IconSize)
+                        )
+                    },
+                    colors = SuggestionChipDefaults.suggestionChipColors(
                         containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                        labelColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                        leadingIconContentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                        labelColor = MaterialTheme.colorScheme.onSecondaryContainer
                     ),
-                    border = null
+                    border = SuggestionChipDefaults.suggestionChipBorder(
+                        borderColor = Color.Transparent,
+                        borderWidth = 0.dp
+                    )
                 )
 
                 Spacer(Modifier.weight(1f))
 
-                FilledTonalButton(onClick = onOpenAccounts) {
-                    Text(stringResource(R.string.account_manager))
+                FilledTonalButton(
+                    onClick = onOpenAccounts,
+                    contentPadding = PaddingValues(
+                        horizontal = 24.dp,
+                        vertical = 12.dp
+                    )
+                ) {
+                    Text(
+                        text = stringResource(R.string.account_manager),
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Medium
+                    )
                 }
             }
         }
@@ -310,22 +343,41 @@ private fun RemoveUserDialog(
         onDismissRequest = onDismiss,
         icon = {
             Icon(
-                imageVector = Icons.TwoTone.Warning,
+                imageVector = Icons.TwoTone.DeleteOutline,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.error
+                tint = MaterialTheme.colorScheme.error,
+                modifier = Modifier.size(36.dp)
             )
         },
         title = {
             Text(
-                text = user.name ?: stringResource(R.string.user_name_default),
-                style = MaterialTheme.typography.headlineSmall
+                text = stringResource(R.string.remove_user_title),
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Medium
             )
         },
         text = {
-            Text(
-                text = stringResource(R.string.delete_user_warning),
-                style = MaterialTheme.typography.bodyMedium
-            )
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(
+                    text = stringResource(R.string.delete_user_warning),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(Modifier.height(8.dp))
+                Surface(
+                    color = MaterialTheme.colorScheme.primaryContainer,
+                    shape = MaterialTheme.shapes.small,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        modifier = Modifier.padding(12.dp),
+                        text = "${user.id} — ${user.name ?: stringResource(R.string.user_name_default)}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
         },
         confirmButton = {
             FilledTonalButton(onClick = onConfirm) {
@@ -337,6 +389,7 @@ private fun RemoveUserDialog(
                 Text(stringResource(R.string.delete_user_cancel))
             }
         },
+        shape = MaterialTheme.shapes.large,
         containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
     )
 }

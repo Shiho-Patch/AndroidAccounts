@@ -33,6 +33,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.SuggestionChipDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -45,10 +47,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
@@ -77,7 +81,7 @@ fun AccountManagerPage(
 
     val context = LocalContext.current
 
-    // Expressive 风格：可折叠大标题
+    // M3 Expressive: 可折叠 LargeTopAppBar
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
         rememberTopAppBarState()
     )
@@ -89,7 +93,10 @@ fun AccountManagerPage(
         topBar = {
             LargeTopAppBar(
                 title = {
-                    Text(stringResource(R.string.account_manager))
+                    Text(
+                        text = stringResource(R.string.account_manager),
+                        fontWeight = FontWeight.Medium
+                    )
                 },
                 actions = {
                     IconButton(onClick = {
@@ -102,14 +109,16 @@ fun AccountManagerPage(
                     }) {
                         Icon(
                             imageVector = Icons.TwoTone.ContentCopy,
-                            contentDescription = stringResource(R.string.copy_packages_cd)
+                            contentDescription = stringResource(R.string.copy_packages_cd),
+                            modifier = Modifier.size(24.dp)
                         )
                     }
                 },
                 scrollBehavior = scrollBehavior,
                 colors = TopAppBarDefaults.largeTopAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                    scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+                    scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface
                 )
             )
         },
@@ -130,10 +139,12 @@ fun AccountManagerPage(
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier.padding(32.dp)
                 ) {
+                    // M3 Expressive 空状态：大圆形容器 + 图标
                     Surface(
-                        modifier = Modifier.size(96.dp),
+                        modifier = Modifier.size(120.dp),
                         shape = CircleShape,
                         color = MaterialTheme.colorScheme.secondaryContainer
                     ) {
@@ -142,13 +153,19 @@ fun AccountManagerPage(
                                 imageVector = Icons.TwoTone.SupervisorAccount,
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.onSecondaryContainer,
-                                modifier = Modifier.size(48.dp)
+                                modifier = Modifier.size(64.dp)
                             )
                         }
                     }
                     Text(
                         text = stringResource(R.string.account_empty),
-                        style = MaterialTheme.typography.titleMedium,
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = stringResource(R.string.account_empty_hint),
+                        style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -163,12 +180,12 @@ fun AccountManagerPage(
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(
-                    start = 16.dp,
-                    end = 16.dp,
-                    top = padding.calculateTopPadding() + 8.dp,
-                    bottom = padding.calculateBottomPadding() + 24.dp
+                    start = 24.dp,
+                    end = 24.dp,
+                    top = padding.calculateTopPadding() + 16.dp,
+                    bottom = padding.calculateBottomPadding() + 32.dp
                 ),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
                 items(viewModel.state.authenticators, key = { it.auth.type }) {
                     var alpha by remember { mutableStateOf(0f) }
@@ -203,24 +220,26 @@ private fun AuthenticatorItemCard(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 0.dp
+        )
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp),
+                .padding(24.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
+            horizontalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            // 应用图标（圆形容器）
+            // 应用图标：primaryContainer 圆形容器
             Surface(
-                modifier = Modifier.size(56.dp),
+                modifier = Modifier.size(72.dp),
                 shape = CircleShape,
                 color = MaterialTheme.colorScheme.primaryContainer
             ) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Image(
-                        modifier = Modifier.size(32.dp),
+                        modifier = Modifier.size(40.dp),
                         painter = rememberDrawablePainter(authenticator.auth.icon),
                         contentDescription = null
                     )
@@ -230,23 +249,36 @@ private fun AuthenticatorItemCard(
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = authenticator.auth.label,
-                    style = MaterialTheme.typography.titleLarge,
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                Spacer(Modifier.height(2.dp))
+                Spacer(Modifier.height(4.dp))
                 Text(
                     text = authenticator.auth.type,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                Spacer(Modifier.height(8.dp))
-                Text(
-                    text = stringResource(
-                        R.string.linked_accounts_count,
-                        authenticator.accounts.size
+                Spacer(Modifier.height(12.dp))
+                SuggestionChip(
+                    onClick = { },
+                    label = {
+                        Text(
+                            text = stringResource(
+                                R.string.linked_accounts_count,
+                                authenticator.accounts.size
+                            ),
+                            style = MaterialTheme.typography.labelLarge
+                        )
+                    },
+                    colors = SuggestionChipDefaults.suggestionChipColors(
+                        containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                        labelColor = MaterialTheme.colorScheme.onTertiaryContainer
                     ),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    border = SuggestionChipDefaults.suggestionChipBorder(
+                        borderColor = Color.Transparent,
+                        borderWidth = 0.dp
+                    )
                 )
             }
         }
