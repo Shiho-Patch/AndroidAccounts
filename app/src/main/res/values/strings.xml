@@ -5,7 +5,7 @@
     <string name="user_name_default">Untitled User</string>
     <string name="current_user_label">Current user</string>
     <string name="other_user_label">Other user</string>
-    <string name="user_id_format">ID: %1$d</string>
+    <string name="user_id_format" formatted="false">ID: %1$d</string>
     <string name="remove_user_title">Remove user</string>
 
     <string name="delete_user_warning">Are you sure you want to remove this user? All accounts and data associated with this user space will be permanently lost.</string>
@@ -17,7 +17,7 @@
     <string name="account_manager">Account Manager</string>
     <string name="account_empty">No accounts yet</string>
     <string name="account_empty_hint">Accounts added by apps in this user space will appear here.</string>
-    <string name="linked_accounts_count">%1$d linked account(s)</string>
+    <string name="linked_accounts_count" formatted="false">%1$d linked account(s)</string>
     <string name="copied_format_hail">Copied! Paste into Hail.</string>
     <string name="copy_packages_cd">Copy package names</string>
     <string name="shizuku_not_working">Please activate Shizuku and grant permission.</string>

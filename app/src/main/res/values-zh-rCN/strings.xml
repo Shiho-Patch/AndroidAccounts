@@ -3,7 +3,7 @@
     <string name="user_name_default">未命名用户</string>
     <string name="current_user_label">当前用户</string>
     <string name="other_user_label">其他用户</string>
-    <string name="user_id_format">编号：%1$d</string>
+    <string name="user_id_format" formatted="false">编号：%1$d</string>
     <string name="remove_user_title">移除用户</string>
 
     <string name="delete_user_warning">确定要移除该用户吗？此用户空间内的所有账号和应用数据将被永久清除。</string>
@@ -14,7 +14,7 @@
     <string name="account_manager">账号管理</string>
     <string name="account_empty">暂无账号</string>
     <string name="account_empty_hint">该用户空间内应用添加的账号会显示在这里。</string>
-    <string name="linked_accounts_count">已关联 %1$d 个账号</string>
+    <string name="linked_accounts_count" formatted="false">已关联 %1$d 个账号</string>
     <string name="copied_format_hail">复制成功！请在【雹】中粘贴。</string>
     <string name="copy_packages_cd">复制包名</string>
     <string name="shizuku_not_working">请激活 Shizuku 并授权。</string>
