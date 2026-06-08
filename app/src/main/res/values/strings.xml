@@ -3,6 +3,8 @@
 
     <string name="user_manager">User Manager</string>
     <string name="user_name_default">Untitled</string>
+    <string name="current_user_label">Current user</string>
+    <string name="other_user_label">Other user</string>
 
     <string name="delete_user_warning">Are you sure you want to delete this user space?\nAll applications and data in this user space will be lost!!!</string>
     <string name="delete_user_confirm">Yes, I\'m sure!</string>
@@ -11,7 +13,9 @@
     <string name="remove">Remove</string>
 
     <string name="account_manager">Account Manager</string>
-    <string name="account_empty">No account exists</string>
-    <string name="copied_format_hail">copied, import it in Hail!</string>
+    <string name="account_empty">No accounts</string>
+    <string name="copied_format_hail">Copied, import it in Hail!</string>
+    <string name="copy_packages_cd">Copy package names</string>
+    <string name="linked_accounts_count">%1$d linked account(s)</string>
     <string name="shizuku_not_working">Please activate Shizuku and agree to grant permission.</string>
 </resources>

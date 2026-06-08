@@ -11,12 +11,12 @@ if (keystorePropsFile.exists()) {
 
 android {
     namespace 'com.rosan.accounts'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.rosan.accounts"
         minSdk 21
-        targetSdk 33
+        targetSdk 34
         versionCode 6
         versionName "1.5"
 
@@ -63,20 +63,20 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '17'
     }
     buildFeatures {
         buildConfig true
         compose true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion '1.4.5'
+        kotlinCompilerExtensionVersion '1.5.8'
     }
-    packagingOptions {
+    packaging {
         resources {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
@@ -84,43 +84,42 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.core:core-ktx:1.10.1'
-    implementation platform('org.jetbrains.kotlin:kotlin-bom:1.8.0')
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
-    implementation 'androidx.activity:activity-compose:1.7.2'
-    implementation platform('androidx.compose:compose-bom:2022.10.00')
+    implementation 'androidx.core:core-ktx:1.12.0'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.7.0'
+    implementation 'androidx.activity:activity-compose:1.8.2'
+
+    implementation platform('androidx.compose:compose-bom:2024.02.01')
     implementation 'androidx.compose.ui:ui'
     implementation 'androidx.compose.ui:ui-graphics'
     implementation 'androidx.compose.ui:ui-tooling-preview'
-    implementation 'androidx.compose.material:material'
     implementation 'androidx.compose.material:material-icons-extended'
     implementation 'androidx.compose.material3:material3'
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
-    androidTestImplementation platform('androidx.compose:compose-bom:2022.10.00')
+    implementation 'androidx.compose.material3:material3-window-size-class'
+    androidTestImplementation platform('androidx.compose:compose-bom:2024.02.01')
     androidTestImplementation 'androidx.compose.ui:ui-test-junit4'
     debugImplementation 'androidx.compose.ui:ui-tooling'
     debugImplementation 'androidx.compose.ui:ui-test-manifest'
 
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+
     compileOnly project(':hidden-api')
 
-    implementation 'androidx.navigation:navigation-compose:2.6.0'
+    implementation 'androidx.navigation:navigation-compose:2.7.7'
 
     implementation 'org.lsposed.hiddenapibypass:hiddenapibypass:4.3'
 
-    def accompanist_version = '0.30.1'
+    def accompanist_version = '0.32.0'
     implementation "com.google.accompanist:accompanist-drawablepainter:$accompanist_version"
     implementation "com.google.accompanist:accompanist-navigation-animation:$accompanist_version"
-    implementation "com.google.accompanist:accompanist-insets:$accompanist_version"
-    implementation "com.google.accompanist:accompanist-insets-ui:$accompanist_version"
     implementation "com.google.accompanist:accompanist-systemuicontroller:$accompanist_version"
 
-    implementation 'io.insert-koin:koin-core:3.4.2'
-    implementation 'io.insert-koin:koin-android:3.4.2'
-    implementation 'io.insert-koin:koin-androidx-compose:3.4.5'
+    implementation 'io.insert-koin:koin-core:3.5.3'
+    implementation 'io.insert-koin:koin-android:3.5.3'
+    implementation 'io.insert-koin:koin-androidx-compose:3.5.3'
 
-    def shizuku_version = "13.1.4"
+    def shizuku_version = "13.1.5"
     implementation "dev.rikka.shizuku:api:$shizuku_version"
     implementation "dev.rikka.shizuku:provider:$shizuku_version"
 }

@@ -15,8 +15,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             AccountsTheme {
+                // Material3 Expressive 风格：整个应用承载于最低层级的 surface
                 Surface(
-                    modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.surfaceContainerLow
                 ) {
                     MainPage()
                 }
